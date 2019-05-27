@@ -1,0 +1,64 @@
+#include <hidef.h>      /* common defines and macros */
+#include "derivative.h" 
+
+
+interrupt 13 void timer5_ISR(void){
+  int DISPLAY_CODES[]= {0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,\
+0x67,0x77,0x7C,0x39,0x5E,0x79,0x71};
+  unsigned digit;
+
+
+  if(sevenSegInx ==4){
+  
+  distGlobalTemp = distGlobal/15;
+  
+  digit = distGlobalTemp%10;
+  
+  PTP = 0xF;                    // disable all LEDs to prevent ghosting
+  PORTB = DISPLAY_CODES[digit];   
+  PTP = 0x7;    // enable right most display
+  
+  TC5 = TCNT + 3*50;    // delay by 100 micro seconds
+  
+  distGlobalTemp = distGlobalTemp/10;
+  
+  }else if(sevenSegInx == 3){
+  
+  digit = distGlobalTemp%10;
+  
+  PTP = 0xF;                    // disable all LEDs to prevent ghosting
+  PORTB = DISPLAY_CODES[digit]; 
+  PTP = 0xB;    // enable right most display
+  
+  distGlobalTemp = distGlobalTemp/10;
+  
+  TC5 = TCNT + 3*50;    // delay by 100 micro seconds
+  }else if(sevenSegInx == 2) {
+  
+  digit = distGlobalTemp%10;
+  
+  PTP = 0xF;                    // disable all LEDs to prevent ghosting
+  PORTB = DISPLAY_CODES[digit]+0x80; 
+  PTP = 0xD;                    // enable right most display
+  
+  distGlobalTemp = distGlobalTemp/10;
+    
+  TC5 = TCNT + 3*50;            // delay by 100 micro seconds
+  }else if(sevenSegInx == 1) {
+  
+  digit = distGlobalTemp%10;
+  
+  PTP = 0xF;                    // disable all LEDs to prevent ghosting
+  PORTB = DISPLAY_CODES[digit]; 
+  PTP = 0xE;                    // enable right most display
+  
+  distGlobalTemp = distGlobalTemp/10;
+    
+  TC5 = TCNT + 3*50;            // delay by 100 micro seconds
+  sevenSegInx = 5;
+  } 
+  
+  --sevenSegInx;
+  
+  
+}
